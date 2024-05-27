@@ -5,7 +5,7 @@ var socket = io.connect('http://localhost:5000');
 $(document).ready(function() {
     $("#deletemessageForm").on("submit", function(event) {
         event.preventDefault();
-        socket.emit('deletemessage', {
+        socket.emit('deletemessageid', {
             message_id: $('#message_id').val(),
             message_value: $('#message_value').val(),
             RealTimeResponse : RealTimeResponse,
