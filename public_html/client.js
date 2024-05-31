@@ -43,10 +43,11 @@ function handleClick(event) {
                 console.log(newMessagefromdb);            
                 const deleteMessageLink = document.getElementById(newMessagefromdb.content.body);
                 const messageElements = document.querySelectorAll('#messageid');
-
+                
                 if (deleteMessageLink) {
                     deleteMessageLink.setAttribute('data-messagevalue', `${newMessagefromdb.content.body}`);
                     deleteMessageLink.setAttribute('data-messageid', `${newMessagefromdb.id}`);
+                    // deleteMessageLink.setAttribute('id',`${newMessagefromdb.id}+${newMessagefromdb.content.body}`)
                 }
                 messageElements.forEach((messageElement) => {
                     messageElement.id = newMessagefromdb.id;
@@ -68,7 +69,8 @@ function handleClick(event) {
                 var linkElement = document.querySelector('#linkimage.linkimage');
                 var imgElement = document.querySelector('#imgsrc.imgsrc');
                 var spinnerElement = document.querySelector('#spinner-border');
-                var idfordelete = document.querySelector('.idfordelete')
+                var idfordeleteList = document.querySelectorAll('.idfordelete');
+                var lastIdForDelete = idfordeleteList[idfordeleteList.length - 1];
                 if (linkElement && imgElement) {
                     linkElement.setAttribute('href', '/storage/' + data.content.path);
                     imgElement.setAttribute('src', '/storage/' + data.content.path);
@@ -76,7 +78,10 @@ function handleClick(event) {
                         spinnerElement.style.display = 'none';
                     }
                     linkElement.style.display = 'block';
-                    idfordelete.setAttribute('id', 'image-' + data.content.path);
+                    lastIdForDelete.setAttribute('id', 'image-' + data.content.path);
+                    lastIdForDelete.setAttribute('data-messagevalue', data.content.path);
+                    lastIdForDelete.setAttribute('onclick',`handleTakeingIdToDelete("image-${ data.content.path}")`);
+                    lastIdForDelete.setAttribute('data-messageid', data.id);
                     linkElement.setAttribute('id', 'linkimage-' + data.content.path);
                     imgElement.setAttribute('id', 'imgsrc-' + data.content.path);
                     if (spinnerElement) {
@@ -174,7 +179,7 @@ function handleNewMessage(data) {
                                     <i class="bx bx-dots-vertical-rounded fs-4"></i>
                                     </button>
                                 <div class="dropdown-menu dropdown-menu-start" aria-labelledby="chat-header-actions">
-                                    <a href="javascript:void(0)" class="idfordelete" id="${data.body}" onclick="handleTakeingIdToDelete('${data.body}')" style="color:red; text-align:center;" data-bs-toggle="modal" data-bs-target="#deletemessage" data-messagevalue="someValue" data-messageid="someId"><i class="bx bx-trash-alt"></i>Delete </a>
+                                    <a href="javascript:void(0)" class="idfordelete forfile" id="${data.body}" onclick="handleTakeingIdToDelete('${data.body}')" style="color:red; text-align:center;" data-bs-toggle="modal" data-bs-target="#deletemessage" data-messagevalue="someValue" data-messageid="someId"><i class="bx bx-trash-alt"></i>Delete </a>
                                 </div>
                             </div>`;
                             chat.innerHTML += `
