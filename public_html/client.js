@@ -64,7 +64,6 @@ function handleClick(event) {
             }     
 
             socket.on('fileMessage', function(data) {
-                console.log(data);
                 var chatMessagesList = document.querySelector('.chat-messages-list');
                 var linkElement = document.querySelector('#linkimage.linkimage');
                 var imgElement = document.querySelector('#imgsrc.imgsrc');
@@ -144,6 +143,7 @@ function formatDate(date) {
 
 socket.on('new_msg',function(data){
 //  boradcast.innerHTML = '';
+console.log(data);
     handleNewMessage(data) ;
     messageSound.play();
 });
@@ -174,7 +174,7 @@ function handleNewMessage(data) {
                                     <i class="bx bx-dots-vertical-rounded fs-4"></i>
                                     </button>
                                 <div class="dropdown-menu dropdown-menu-start" aria-labelledby="chat-header-actions">
-                                    <a href="javascript:void(0)" class="idfordelete" id="${data.body}" style="color:red; text-align:center;" data-bs-toggle="modal" data-bs-target="#deletemessage" data-messagevalue="someValue" data-messageid="someId"><i class="bx bx-trash-alt"></i>Delete </a>
+                                    <a href="javascript:void(0)" class="idfordelete" id="${data.body}" onclick="handleTakeingIdToDelete('${data.body}')" style="color:red; text-align:center;" data-bs-toggle="modal" data-bs-target="#deletemessage" data-messagevalue="someValue" data-messageid="someId"><i class="bx bx-trash-alt"></i>Delete </a>
                                 </div>
                             </div>`;
                             chat.innerHTML += `
@@ -226,23 +226,60 @@ socket.on('new_borad',function(data){
  boradcast.innerHTML = '<strong>'+data.username+': </strong> write message <img src="/write.gif" style="width:25px;height:20px" />';
 });
 
-document.addEventListener('click', function(event) {
-    if (event.target.closest('.idfordelete')) {
-        var target = event.target.closest('.idfordelete');
-        if (target) {
-            var messageValue = target.getAttribute('data-messagevalue');
-            var messageId = target.getAttribute('data-messageid');
-            if (message_value) {
-                message_value.value = messageValue;
-            } else {
-                console.warn('Element with id "message_value" not found');
-            }
 
-            if (message_id) {
-                message_id.value = messageId;
-            } else {
-                console.warn('Element with id "message_id" not found');
-            }
+
+
+
+
+
+// var deleteButton = document.querySelector('.idfordelete'); // Select the first element with the class 'idfordelete'
+// if (deleteButton) {
+    
+// deleteButton.addEventListener('click', function(event) {
+//     var target = event.currentTarget; // Use event.currentTarget to refer to the clicked element
+//     var messageValue = target.getAttribute('data-messagevalue');
+//     var messageId = target.getAttribute('data-messageid');
+
+//     var message_value = document.getElementById('message_value');
+//     var message_id = document.getElementById('message_id');
+
+//     if (message_value) {
+//         message_value.value = messageValue;
+//     } else {
+//         console.warn('Element with id "message_value" not found');
+//     }
+
+//     if (message_id) {
+//         message_id.value = messageId;
+//     } else {
+//         console.warn('Element with id "message_id" not found');
+//     }
+// });
+// }
+
+
+function handleTakeingIdToDelete(id) {
+    var deletedata = document.getElementById(id);
+    if (deletedata) {
+        var messageValue = deletedata.getAttribute('data-messagevalue');
+        var messageId = deletedata.getAttribute('data-messageid');
+                console.log(messageId);
+                console.log(messageValue);
+        var message_value = document.getElementById('message_value');
+        if (message_value && message_id) {
+            message_value.value = messageValue;
+            message_id.value = messageId;
+        } else {
+            console.error("One or both of the elements are null.");
         }
+    } else {
+        console.error("No element found with ID:", id);
     }
-});
+}
+
+
+
+ // var messageValue = deletedata.getAttribute('data-messagevalue');
+    // var messageId = deletedata.getAttribute('data-messageid');
+    // console.log(messageValue);
+    // console.log(messageValue);
