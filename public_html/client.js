@@ -37,10 +37,6 @@ function handleClick(event) {
                 socket.emit('message', newMessage);
 
             setTimeout(() => {
-                // socket.emit('new_deleteMessageid', {
-                //     newMessagefromdb: newMessagefromdb,
-                // });
-                console.log(newMessagefromdb);            
                 const deleteMessageLink = document.getElementById(newMessagefromdb.content.body);
                 const messageElements = document.querySelectorAll('#messageid');
                 
@@ -63,7 +59,9 @@ function handleClick(event) {
                     socket.emit('fileMessage', filemeessage);
                 }, 3000); }
             }     
-
+            socket.on('new_deleteMessageid',function(data) {
+                console.log(data);
+            });
             socket.on('fileMessage', function(data) {
                 var chatMessagesList = document.querySelector('.chat-messages-list');
                 var linkElement = document.querySelector('#linkimage.linkimage');
@@ -123,9 +121,11 @@ function handleClick(event) {
 $(document).ready(function() {
     $("#deletemessageForm").on("submit", function(event) {
         event.preventDefault();
+        var message_id = document.querySelector('#message_idN2').value;
+        var message_value = document.querySelector('#message_valueN2').value;
         socket.emit('deletemessageid', {
-            message_id: $('#message_id').val(),
-            message_value: $('#message_value').val(),
+            message_id: message_id,
+            message_value: message_value,
             RealTimeResponse : RealTimeResponse,
         });
     });
@@ -148,7 +148,6 @@ function formatDate(date) {
 
 socket.on('new_msg',function(data){
 //  boradcast.innerHTML = '';
-console.log(data);
     handleNewMessage(data) ;
     messageSound.play();
 });
@@ -268,8 +267,6 @@ function handleTakeingIdToDelete(id) {
     if (deletedata) {
         var messageValue = deletedata.getAttribute('data-messagevalue');
         var messageId = deletedata.getAttribute('data-messageid');
-                console.log(messageId);
-                console.log(messageValue);
         var message_value = document.getElementById('message_value');
         if (message_value && message_id) {
             message_value.value = messageValue;
