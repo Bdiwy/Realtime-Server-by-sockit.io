@@ -35,25 +35,26 @@ function handleClick(event) {
                     body: body.value,
                 };
                 socket.emit('message', newMessage);
-
-            setTimeout(() => {
-                const deleteMessageLink = document.getElementById(newMessagefromdb.content.body);
-                const messageElements = document.querySelectorAll('#messageid');
+                setTimeout(() => {
+                    console.log(newMessagefromdb);
+                    const deleteMessageLink = document.getElementById(newMessagefromdb.content.body);
+                    const messageElements = document.querySelectorAll('#messageid');
+                    
+                    if (deleteMessageLink) {
+                        deleteMessageLink.setAttribute('data-messagevalue', `${newMessagefromdb.content.body}`);
+                        deleteMessageLink.setAttribute('data-messageid', `${newMessagefromdb.id}`);
+                        // deleteMessageLink.setAttribute('id',`${newMessagefromdb.id}+${newMessagefromdb.content.body}`)
+                    }
+                    messageElements.forEach((messageElement) => {
+                        messageElement.id = newMessagefromdb.id;
+                    });
                 
-                if (deleteMessageLink) {
-                    deleteMessageLink.setAttribute('data-messagevalue', `${newMessagefromdb.content.body}`);
-                    deleteMessageLink.setAttribute('data-messageid', `${newMessagefromdb.id}`);
-                    // deleteMessageLink.setAttribute('id',`${newMessagefromdb.id}+${newMessagefromdb.content.body}`)
-                }
-                messageElements.forEach((messageElement) => {
-                    messageElement.id = newMessagefromdb.id;
-                });
+                    const message_id = document.querySelector('#message_id');
+                    if (message_id) {
+                        message_id.id = newMessagefromdb.id;
+                    }
+                    }, 3000);
             
-                const message_id = document.querySelector('#message_id');
-                if (message_id) {
-                    message_id.id = newMessagefromdb.id;
-                }
-                }, 3000);
             if (messageType == 'file') {
                 setTimeout(() => {
                     socket.emit('fileMessage', filemeessage);
@@ -117,18 +118,40 @@ function handleClick(event) {
             
             });
 
+document.addEventListener('DOMContentLoaded', function() {
+    var realtimeForm = document.getElementById('deletemessageFormRealtime');
+    var normalForm = document.getElementById('deletemessageForm');
 
-$(document).ready(function() {
-    $("#deletemessageForm").on("submit", function(event) {
-        event.preventDefault();
-        var message_id = document.querySelector('#message_idN2').value;
-        var message_value = document.querySelector('#message_valueN2').value;
-        socket.emit('deletemessageid', {
-            message_id: message_id,
-            message_value: message_value,
-            RealTimeResponse : RealTimeResponse,
+    function handleFormSubmission(form) {
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            var messageId = form.querySelector('input[name="message_id"]').value;
+            var messageValue = form.querySelector('input[name="message_value"]').value;
+            // Assuming 'socket' is already defined and connected
+            socket.emit('deletemessageid', {
+                message_id: messageId,
+                message_value: messageValue,
+                RealTimeResponse: RealTimeResponse, // Ensure RealTimeResponse is defined
+            });
         });
-    });
+    }
+
+    handleFormSubmission(realtimeForm);
+    handleFormSubmission(normalForm);
+});
+
+
+socket.on('new_deletemessageid', function(data) {
+    console.log(data);
+    var messageElement = document.getElementById(data.message_id);
+    var messageBody = messageElement.querySelector('p.mb-0.left');
+
+    if (messageBody) {
+        messageBody.innerHTML = `<span style="color: red;">&#x2716; this message was deleted</span>`;
+    }else{
+        messageElement.innerHTML = `<span style="color: red;">&#x2716; this message was deleted</span>`;
+    }
 });
 
 function formatDate(date) {
@@ -140,18 +163,42 @@ function formatDate(date) {
     return day + ' ' + hour + ':' + minutes + ' ' + period;
 }
 
-// message.addEventListener('keypress',function(){
-// 	socket.emit('borad',{
-// 		chat_id:chat_id.value
-// 	});
-// });
+
 
 socket.on('new_msg',function(data){
 //  boradcast.innerHTML = '';
     handleNewMessage(data) ;
     messageSound.play();
+    handelmessageid();
 });
+function handelmessageid(){
+    setTimeout(() => {
 
+    socket.emit('sharingId',{
+            newMessagefromdb:newMessagefromdb
+    });
+
+    }, 3000);
+}
+socket.on('sharingId',function (data){
+
+    const deleteMessageLink = document.getElementById(data.newMessagefromdb.content.body);
+    const messageElements = document.querySelectorAll('#messageid');
+    
+    if (deleteMessageLink) {
+        deleteMessageLink.setAttribute('data-messagevalue', `${data.newMessagefromdb.content.body}`);
+        deleteMessageLink.setAttribute('data-messageid', `${data.newMessagefromdb.id}`);
+        // deleteMessageLink.setAttribute('id',`${newMessagefromdb.id}+${newMessagefromdb.content.body}`)
+    }
+    messageElements.forEach((messageElement) => {
+        messageElement.id = data.newMessagefromdb.id;
+    });
+
+    const message_id = document.querySelector('#message_id');
+    if (message_id) {
+        message_id.id = newMessagefromdb.id;
+    }
+});
 
 
 function handleNewMessage(data) {

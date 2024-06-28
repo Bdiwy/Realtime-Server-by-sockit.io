@@ -27,5 +27,9 @@ sio.on('connection', function (visitor) {
 		visitor.broadcast.emit('new_borad', data);
 	});
 
+	visitor.on('sharingId', function (data) {
+		visitor.broadcast.emit('sharingId', data);
+	});
+
 
 });
