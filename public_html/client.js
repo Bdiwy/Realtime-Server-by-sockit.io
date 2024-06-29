@@ -279,36 +279,6 @@ socket.on('new_borad',function(data){
 
 
 
-
-
-
-
-// var deleteButton = document.querySelector('.idfordelete'); // Select the first element with the class 'idfordelete'
-// if (deleteButton) {
-    
-// deleteButton.addEventListener('click', function(event) {
-//     var target = event.currentTarget; // Use event.currentTarget to refer to the clicked element
-//     var messageValue = target.getAttribute('data-messagevalue');
-//     var messageId = target.getAttribute('data-messageid');
-
-//     var message_value = document.getElementById('message_value');
-//     var message_id = document.getElementById('message_id');
-
-//     if (message_value) {
-//         message_value.value = messageValue;
-//     } else {
-//         console.warn('Element with id "message_value" not found');
-//     }
-
-//     if (message_id) {
-//         message_id.value = messageId;
-//     } else {
-//         console.warn('Element with id "message_id" not found');
-//     }
-// });
-// }
-
-
 function handleTakeingIdToDelete(id) {
     var deletedata = document.getElementById(id);
     if (deletedata) {
@@ -325,10 +295,3 @@ function handleTakeingIdToDelete(id) {
         console.error("No element found with ID:", id);
     }
 }
-
-
-
- // var messageValue = deletedata.getAttribute('data-messagevalue');
-    // var messageId = deletedata.getAttribute('data-messageid');
-    // console.log(messageValue);
-    // console.log(messageValue);
