@@ -35,6 +35,8 @@ function handleClick(event) {
                     body: body.value,
                 };
                 socket.emit('message', newMessage);
+                if (messageType != 'file') {
+
                 setTimeout(() => {
                     console.log(newMessagefromdb);
                     const deleteMessageLink = document.getElementById(newMessagefromdb.content.body);
@@ -54,16 +56,16 @@ function handleClick(event) {
                         message_id.id = newMessagefromdb.id;
                     }
                     }, 3000);
-            
+                }
             if (messageType == 'file') {
                 setTimeout(() => {
                     socket.emit('fileMessage', filemeessage);
                 }, 3000); }
-            }     
-            socket.on('new_deleteMessageid',function(data) {
-                console.log(data);
-            });
+            }
             socket.on('fileMessage', function(data) {
+                console.log(data);
+                var messageid = document.querySelector('#hasimage');
+                messageid.id= data.id;
                 var chatMessagesList = document.querySelector('.chat-messages-list');
                 var linkElement = document.querySelector('#linkimage.linkimage');
                 var imgElement = document.querySelector('#imgsrc.imgsrc');

@@ -31,5 +31,7 @@ sio.on('connection', function (visitor) {
 		visitor.broadcast.emit('sharingId', data);
 	});
 
-
+	visitor.on('sharingIdForimage', function (data) {
+		visitor.sockets.emit('sharingIdForimage', data);
+	});
 });
