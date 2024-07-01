@@ -1,5 +1,7 @@
 var socket = io.connect('http://localhost:5000');
-
+var realtimeMessage      = null;
+var messageType          = null;
+var isthismyMessage      = null;
 var chat_id              = document.querySelector('#chat_id');
 var body                 = document.querySelector('.message-input');
 var chat 	             = document.querySelector('.chat-messages-list');
@@ -18,7 +20,6 @@ var sendButtons = [
 
   // Function to handle the click event
 function handleClick(event) {
-    let messageType = '';
     if (event.target.id === 'sendMessageBtn') {
         messageType = 'text';
     } else if (event.target.id === 'sendFileBtn') {
@@ -64,6 +65,7 @@ function handleClick(event) {
             }
             socket.on('fileMessage', function(data) {
                 console.log(data);
+                realtimeMessage.innerText=data.content.body;
                 var messageid = document.querySelector('#hasimage');
                 messageid.id= data.id;
                 var chatMessagesList = document.querySelector('.chat-messages-list');
@@ -79,10 +81,12 @@ function handleClick(event) {
                         spinnerElement.style.display = 'none';
                     }
                     linkElement.style.display = 'block';
+                    if (isthismyMessage == true) {  
                     lastIdForDelete.setAttribute('id', 'image-' + data.content.path);
                     lastIdForDelete.setAttribute('data-messagevalue', data.content.path);
                     lastIdForDelete.setAttribute('onclick',`handleTakeingIdToDelete("image-${ data.content.path}")`);
                     lastIdForDelete.setAttribute('data-messageid', data.id);
+                    }
                     linkElement.setAttribute('id', 'linkimage-' + data.content.path);
                     imgElement.setAttribute('id', 'imgsrc-' + data.content.path);
                     if (spinnerElement) {
@@ -145,14 +149,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 socket.on('new_deletemessageid', function(data) {
-    console.log(data);
     var messageElement = document.getElementById(data.message_id);
-    var messageBody = messageElement.querySelector('p.mb-0.left');
-
-    if (messageBody) {
-        messageBody.innerHTML = `<span style="color: red;">&#x2716; this message was deleted</span>`;
+    var messageBodyfortext = messageElement.querySelector('p.mb-0');
+    var messageBodyforfile = messageElement.querySelector('a');
+    if (messageBodyforfile) {
+        messageBodyforfile.innerHTML = `<span style="color: red;">&#x2716; this message was deleted</span>`;
     }else{
-        messageElement.innerHTML = `<span style="color: red;">&#x2716; this message was deleted</span>`;
+        messageBodyfortext.innerHTML = `<span style="color: red;">&#x2716; this message was deleted</span>`;
     }
 });
 
@@ -169,11 +172,20 @@ function formatDate(date) {
 
 socket.on('new_msg',function(data){
 //  boradcast.innerHTML = '';
+console.log(data);
+    realtimeMessage=document.getElementById('gr-'+data.chat_id);
+
     handleNewMessage(data) ;
     messageSound.play();
+
+    if ( messageType != 'file' ) {
     handelmessageid();
+    realtimeMessage.innerText=data.body;
+    }
 });
+
 function handelmessageid(){
+
     setTimeout(() => {
 
     socket.emit('sharingId',{
@@ -181,8 +193,9 @@ function handelmessageid(){
     });
 
     }, 3000);
-}
-socket.on('sharingId',function (data){
+    if (isthismyMessage != true) {
+        
+    socket.on('sharingId',function (data){
 
     const deleteMessageLink = document.getElementById(data.newMessagefromdb.content.body);
     const messageElements = document.querySelectorAll('#messageid');
@@ -201,6 +214,10 @@ socket.on('sharingId',function (data){
         message_id.id = newMessagefromdb.id;
     }
 });
+}
+
+}
+
 
 
 function handleNewMessage(data) {
@@ -209,7 +226,7 @@ function handleNewMessage(data) {
     var chatMessagesList = document.querySelector('.chat-messages-list');
 
     if (data.RealTimeResponse.chatId == data.chat_id && data.RealTimeResponse.chatId == chatHistory.id) {
-    var isthismyMessage = data.messagememberid == RealTimeResponse.memberid ;
+    isthismyMessage = data.messagememberid == RealTimeResponse.memberid ;
     var imagePath = data.RealTimeResponse.userdata;
     var senderName;
     if (data.RealTimeResponse.userType == '1') {
@@ -257,7 +274,7 @@ function handleNewMessage(data) {
                                             ` :''}
                                             
                                             
-                                            <p class="mb-0  ${isthismyMessage ? 'right' : 'left'}">
+                                            <p class="mb-0 messagebodyfordelete ${isthismyMessage ? 'right' : 'left'}">
                                                 ${data.body}
                                             </p>
                                         </div>
