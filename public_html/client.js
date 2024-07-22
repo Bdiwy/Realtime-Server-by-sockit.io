@@ -12,6 +12,9 @@ var messageSound         = document.getElementById('messageSound');
 var message_id           = document.getElementById('message_id') ;
 var path                 = document.getElementById('attach-doc');
 var filedata             = document.getElementById('filedata');
+var userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+localStorage.setItem('userTimezone', userTimezone);
+
 // Select both buttons
 var sendButtons = [
     document.getElementById('sendMessageBtn'),
@@ -158,14 +161,31 @@ socket.on('new_deletemessageid', function(data) {
         messageBodyfortext.innerHTML = `<span style="color: red;">&#x2716; this message was deleted</span>`;
     }
 });
-
-function formatDate(date) {
-    var daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    var day = daysOfWeek[date.getDay()];
-    var hour = date.getHours() % 12 || 12;
-    var period = date.getHours() >= 12 ? 'PM' : 'AM';
-    var minutes = ('0' + date.getMinutes()).slice(-2);
-    return day + ' ' + hour + ':' + minutes + ' ' + period;
+function formatDate(date, timezone) {
+    if (timezone) {
+        var options = {
+            timeZone: timezone,
+            weekday: 'short',
+            hour: 'numeric',
+            minute: 'numeric',
+            hour12: true
+        };
+        var dateTimeFormat = new Intl.DateTimeFormat('en-US', options);
+        var parts = dateTimeFormat.formatToParts(date);
+        var day = parts.find(part => part.type === 'weekday').value;
+        var hour = parts.find(part => part.type === 'hour').value;
+        var minutes = parts.find(part => part.type === 'minute').value;
+        var period = parts.find(part => part.type === 'dayPeriod').value;
+        minutes = ('0' + minutes).slice(-2);
+        return day + ' ' + hour + ':' + minutes + ' ' + period;
+    } else {
+        var daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        var day = daysOfWeek[date.getDay()];
+        var hour = date.getHours() % 12 || 12;
+        var period = date.getHours() >= 12 ? 'PM' : 'AM';
+        var minutes = ('0' + date.getMinutes()).slice(-2);
+        return day + ' ' + hour + ':' + minutes + ' ' + period;
+    }
 }
 
 
@@ -222,7 +242,8 @@ function handelmessageid(){
 
 function handleNewMessage(data) {
     var currentDateTime = new Date(); 
-    var formattedDateTime = formatDate(currentDateTime);
+    var userTimezone = localStorage.getItem('userTimezone');
+    var formattedDateTime = formatDate(currentDateTime, userTimezone);
     var chatMessagesList = document.querySelector('.chat-messages-list');
 
     if (data.RealTimeResponse.chatId == data.chat_id && data.RealTimeResponse.chatId == chatHistory.id) {
