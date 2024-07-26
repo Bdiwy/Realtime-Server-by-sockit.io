@@ -64,6 +64,7 @@ function handleClick(event) {
             if (messageType == 'file') {
                 setTimeout(() => {
                     socket.emit('fileMessage', filemeessage);
+                    console.log(filemeessage);
                 }, 3000); }
             }
             socket.on('fileMessage', function(data) {
@@ -295,7 +296,7 @@ function handleNewMessage(data) {
                                             ` :''}
                                             
                                             
-                                            <p class="mb-0 messagebodyfordelete ${isthismyMessage ? 'right' : 'left'}">
+                                            <p class="mb-0 messagebodyfordelete ${isthismyMessage ? 'right' : 'left'}" dir="auto">
                                                 ${data.body}
                                             </p>
                                         </div>
