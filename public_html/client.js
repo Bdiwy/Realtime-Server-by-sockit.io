@@ -23,50 +23,65 @@ var sendButtons = [
 
   // Function to handle the click event
 function handleClick(event) {
+    let messageType = '';
+
     if (event.target.id === 'sendMessageBtn') {
         messageType = 'text';
     } else if (event.target.id === 'sendFileBtn') {
         messageType = 'file';
     }
-                const newMessage = {
-                    path : path.value ,
-                    type : path.value ? 'file' : '' ,
-                    id: 'msg_' + Date.now(), // Generating a unique ID for each message
-                    RealTimeResponse: RealTimeResponse,
-                    messagememberid: RealTimeResponse.memberid,
-                    currentUserId: currentUserId,
-                    chat_id: chat_id.value,
-                    body: body.value,
-                };
-                socket.emit('message', newMessage);
-                if (messageType != 'file') {
 
-                setTimeout(() => {
-                    console.log(newMessagefromdb);
-                    const deleteMessageLink = document.getElementById(newMessagefromdb.content.body);
-                    const messageElements = document.querySelectorAll('#messageid');
-                    
-                    if (deleteMessageLink) {
-                        deleteMessageLink.setAttribute('data-messagevalue', `${newMessagefromdb.content.body}`);
-                        deleteMessageLink.setAttribute('data-messageid', `${newMessagefromdb.id}`);
-                        // deleteMessageLink.setAttribute('id',`${newMessagefromdb.id}+${newMessagefromdb.content.body}`)
-                    }
-                    messageElements.forEach((messageElement) => {
-                        messageElement.id = newMessagefromdb.id;
-                    });
-                
-                    const message_id = document.querySelector('#message_id');
-                    if (message_id) {
-                        message_id.id = newMessagefromdb.id;
-                    }
-                    }, 3000);
+    const newMessage = {
+        path: path.value,
+        type: path.value ? 'file' : '',
+        id: 'msg_' + Date.now(), 
+        RealTimeResponse: RealTimeResponse,
+        messagememberid: RealTimeResponse.memberid,
+        currentUserId: currentUserId,
+        chat_id: chat_id.value,
+        body: body.value,
+    };
+
+    socket.emit('message', newMessage);
+
+    if (messageType !== 'file') {
+        const checkMessageInterval = setInterval(() => {
+            if (newMessagefromdb && newMessagefromdb.id) { // Adjust the condition as needed
+                console.log(newMessagefromdb);
+                const deleteMessageLink = document.getElementById(newMessagefromdb.content.body);
+                const messageElements = document.querySelectorAll('#messageid');
+
+                if (deleteMessageLink) {
+                    deleteMessageLink.setAttribute('data-messagevalue', `${newMessagefromdb.content.body}`);
+                    deleteMessageLink.setAttribute('data-messageid', `${newMessagefromdb.id}`);
+                    // deleteMessageLink.setAttribute('id',`${newMessagefromdb.id}+${newMessagefromdb.content.body}`)
                 }
-            if (messageType == 'file') {
-                setTimeout(() => {
-                    socket.emit('fileMessage', filemeessage);
-                    console.log(filemeessage);
-                }, 3000); }
+
+                messageElements.forEach((messageElement) => {
+                    messageElement.id = newMessagefromdb.id;
+                });
+
+                const message_id = document.querySelector('#message_id');
+                if (message_id) {
+                    message_id.id = newMessagefromdb.id;
+                }
+
+                clearInterval(checkMessageInterval);
             }
+        }, 100); 
+    }
+
+    if (messageType === 'file') {
+        const checkFileMessageInterval = setInterval(() => {
+            if (filemeessage && filemeessage.length > 0) {
+                socket.emit('fileMessage', filemeessage);
+                console.log(filemeessage);
+                clearInterval(checkFileMessageInterval); 
+            }
+        }, 100);
+    }
+}
+
             socket.on('fileMessage', function(data) {
                 console.log(data);
                 realtimeMessage.innerText=data.content.body;
