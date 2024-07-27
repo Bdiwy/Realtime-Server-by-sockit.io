@@ -46,7 +46,7 @@ function handleClick(event) {
 
     if (messageType !== 'file') {
         const checkMessageInterval = setInterval(() => {
-            if (newMessagefromdb && newMessagefromdb.id) { // Adjust the condition as needed
+            if (newMessagefromdb != null) { // Adjust the condition as needed
                 console.log(newMessagefromdb);
                 const deleteMessageLink = document.getElementById(newMessagefromdb.content.body);
                 const messageElements = document.querySelectorAll('#messageid');
@@ -73,7 +73,7 @@ function handleClick(event) {
 
     if (messageType === 'file') {
         const checkFileMessageInterval = setInterval(() => {
-            if (filemeessage && filemeessage.length > 0) {
+            if (filemeessage!=null) {
                 socket.emit('fileMessage', filemeessage);
                 console.log(filemeessage);
                 clearInterval(checkFileMessageInterval); 
