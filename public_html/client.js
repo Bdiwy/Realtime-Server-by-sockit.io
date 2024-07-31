@@ -257,9 +257,12 @@ function handleNewMessage(data) {
     var userTimezone = localStorage.getItem('userTimezone');
     var formattedDateTime = formatDate(currentDateTime, userTimezone);
     var chatMessagesList = document.querySelector('.chat-messages-list');
-
+// console.log(data.RealTimeResponse.userdata.id);
+// console.log(data);
+// console.log(RealTimeResponse);
+// console.log(data.RealTimeResponse.userType);
     if (data.RealTimeResponse.chatId == data.chat_id && data.RealTimeResponse.chatId == chatHistory.id) {
-    isthismyMessage = data.messagememberid == RealTimeResponse.memberid ;
+    isthismyMessage = data.messagememberid == RealTimeResponse.memberid && user_type == data.RealTimeResponse.userType && data.RealTimeResponse.userdata.id == currentUserId ;
     var imagePath = data.RealTimeResponse.userdata;
     var senderName;
     if (data.RealTimeResponse.userType == '1') {
