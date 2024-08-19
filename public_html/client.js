@@ -13,6 +13,8 @@ var message_id           = document.getElementById('message_id') ;
 var path                 = document.getElementById('attach-doc');
 var filedata             = document.getElementById('filedata');
 var userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+var tempid = 'msg_' + Date.now();
+
 localStorage.setItem('userTimezone', userTimezone);
 
 // Select both buttons
@@ -34,12 +36,12 @@ function handleClick(event) {
     const newMessage = {
         path: path.value,
         type: path.value ? 'file' : '',
-        id: 'msg_' + Date.now(), 
         RealTimeResponse: RealTimeResponse,
         messagememberid: RealTimeResponse.memberid,
         currentUserId: currentUserId,
         chat_id: chat_id.value,
         body: body.value,
+        tempid:tempid
     };
 
     socket.emit('message', newMessage);
@@ -154,7 +156,7 @@ document.addEventListener('DOMContentLoaded', function() {
             socket.emit('deletemessageid', {
                 message_id: messageId,
                 message_value: messageValue,
-                RealTimeResponse: RealTimeResponse, // Ensure RealTimeResponse is defined
+                RealTimeResponse: RealTimeResponse,
             });
         });
     }
@@ -206,6 +208,8 @@ function formatDate(date, timezone) {
 socket.on('new_msg',function(data){
 //  boradcast.innerHTML = '';
     realtimeMessage=document.getElementById('gr-'+data.chat_id);
+console.log('realtimeid');
+console.log(data);
 
     handleNewMessage(data) ;
     messageSound.play();
@@ -276,11 +280,11 @@ function handleNewMessage(data) {
                                     <i class="bx bx-dots-vertical-rounded fs-4"></i>
                                     </button>
                                 <div class="dropdown-menu dropdown-menu-start" aria-labelledby="chat-header-actions">
-                                    <a href="javascript:void(0)" class="idfordelete forfile" id="${data.body}" onclick="handleTakeingIdToDelete('${data.body}')" style="color:red; text-align:center;" data-bs-toggle="modal" data-bs-target="#deletemessage" data-messagevalue="someValue" data-messageid="someId"><i class="bx bx-trash-alt"></i>Delete </a>
+                                    <a href="javascript:void(0)" class="idfordelete forfile" id="${data.tempid}" onclick="handleTakeingIdToDelete('${data.tempid}')" style="color:red; text-align:center;" data-bs-toggle="modal" data-bs-target="#deletemessage" data-messagevalue="someValue" data-messageid="${data.tempid}"><i class="bx bx-trash-alt"></i>Delete </a>
                                 </div>
                             </div>`;
                             chat.innerHTML += `
-                            <li class="chat-message ${isthismyMessage ? 'chat-message-right' : 'chat-message-left' } ${data.id} ">
+                            <li class="chat-message ${isthismyMessage ? 'chat-message-right' : 'chat-message-left' } ${data.tempid} ">
                                 <div class="d-flex overflow-hidden">
                                     ${!isthismyMessage ? `
                                         <div class="user-avatar flex-shrink-0 ms-3">
