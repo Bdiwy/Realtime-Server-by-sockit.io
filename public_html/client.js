@@ -13,9 +13,14 @@ var message_id           = document.getElementById('message_id') ;
 var path                 = document.getElementById('attach-doc');
 var filedata             = document.getElementById('filedata');
 var userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-var tempid = 'msg_' + Date.now();
-
 localStorage.setItem('userTimezone', userTimezone);
+var counter = 1 ;
+function generateTempId() {
+    counter ++;
+    return 'msg_' + Date.now() + '_' + Math.floor(Math.random() * 1000)+counter;
+}
+var tempid = generateTempId();
+
 
 // Select both buttons
 var sendButtons = [
@@ -152,7 +157,6 @@ document.addEventListener('DOMContentLoaded', function() {
             
             var messageId = form.querySelector('input[name="message_id"]').value;
             var messageValue = form.querySelector('input[name="message_value"]').value;
-            // Assuming 'socket' is already defined and connected
             socket.emit('deletemessageid', {
                 message_id: messageId,
                 message_value: messageValue,
@@ -167,11 +171,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 socket.on('new_deletemessageid', function(data) {
-    var messageElement = document.getElementById(data.message_id);
-    var messageBodyfortext = messageElement.querySelector('p.mb-0');
-    var messageBodyforfile = messageElement.querySelector('a');
-    if (messageBodyforfile) {
-        messageBodyforfile.innerHTML = `<span style="color: red;">&#x2716; this message was deleted</span>`;
+    var messageElement = document.getElementsByClassName(data.message_id);
+    
+    var messageBodyfortext = messageElement[0].querySelector('.messagebodyfordelete');
+    var messageBodyforfile = messageElement[0].querySelector('a');
+
+    if (messageBodyfortext) {
+        messageBodyfortext.innerHTML = `<span style="color: red;">&#x2716; this message was deleted</span>`;
     }else{
         messageBodyfortext.innerHTML = `<span style="color: red;">&#x2716; this message was deleted</span>`;
     }
@@ -208,9 +214,9 @@ function formatDate(date, timezone) {
 socket.on('new_msg',function(data){
 //  boradcast.innerHTML = '';
     realtimeMessage=document.getElementById('gr-'+data.chat_id);
-console.log('realtimeid');
-console.log(data);
-
+    console.log('realtimeid');
+    console.log(data);
+    tempid = generateTempId();
     handleNewMessage(data) ;
     messageSound.play();
 
@@ -280,11 +286,11 @@ function handleNewMessage(data) {
                                     <i class="bx bx-dots-vertical-rounded fs-4"></i>
                                     </button>
                                 <div class="dropdown-menu dropdown-menu-start" aria-labelledby="chat-header-actions">
-                                    <a href="javascript:void(0)" class="idfordelete forfile" id="${data.tempid}" onclick="handleTakeingIdToDelete('${data.tempid}')" style="color:red; text-align:center;" data-bs-toggle="modal" data-bs-target="#deletemessage" data-messagevalue="someValue" data-messageid="${data.tempid}"><i class="bx bx-trash-alt"></i>Delete </a>
+                                    <a href="javascript:void(0)" class="idfordelete forfile" id="${data.tempid}" onclick="handleTakeingIdToDelete('${data.tempid}')" style="color:red; text-align:center;" data-bs-toggle="modal" data-bs-target="#deletemessage" data-messagevalue="${data.body}" data-messageid="${data.tempid}"><i class="bx bx-trash-alt"></i>Delete </a>
                                 </div>
                             </div>`;
                             chat.innerHTML += `
-                            <li class="chat-message ${isthismyMessage ? 'chat-message-right' : 'chat-message-left' } ${data.tempid} ">
+                            <li class="chat-message ${isthismyMessage ? 'chat-message-right' : 'chat-message-left' } ${data.tempid}">
                                 <div class="d-flex overflow-hidden">
                                     ${!isthismyMessage ? `
                                         <div class="user-avatar flex-shrink-0 ms-3">
