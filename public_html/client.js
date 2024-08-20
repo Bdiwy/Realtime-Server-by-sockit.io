@@ -88,9 +88,10 @@ function handleClick(event) {
 }
 
             socket.on('fileMessage', function(data) {
+                console.log('sssheroool');
+                console.log(data);
+                
                 realtimeMessage.innerText=data.content.body;
-                var messageid = document.querySelector('#hasimage');
-                messageid.id= data.id;
                 var chatMessagesList = document.querySelector('.chat-messages-list');
                 var linkElement = document.querySelector('#linkimage.linkimage');
                 var imgElement = document.querySelector('#imgsrc.imgsrc');
@@ -108,7 +109,7 @@ function handleClick(event) {
                     lastIdForDelete.setAttribute('id', 'image-' + data.content.path);
                     lastIdForDelete.setAttribute('data-messagevalue', data.content.path);
                     lastIdForDelete.setAttribute('onclick',`handleTakeingIdToDelete("image-${ data.content.path}")`);
-                    lastIdForDelete.setAttribute('data-messageid', data.id);
+                    lastIdForDelete.setAttribute('data-messageid', data.tempid);
                     }
                     linkElement.setAttribute('id', 'linkimage-' + data.content.path);
                     imgElement.setAttribute('id', 'imgsrc-' + data.content.path);
@@ -120,18 +121,18 @@ function handleClick(event) {
                 const deleteMessageLink = document.getElementById('image-' + data.content.path);
                 const messageElements = document.querySelectorAll('#messageid');
                 messageElements.forEach((messageElement) => {
-                    messageElement.id = data.id;
+                    messageElement.tempid = data.tempid;
                 });
             
                 const message_id = document.querySelector('#message_id');
                 if (message_id) {
-                    message_id.id = data.id;
+                    message_id.tempid = data.tempid;
                 }
             
                 if (deleteMessageLink) {
                     // deleteMessageLink.setAttribute('onclick', `deleteMessage(${data.id} , '${data.content.body}')`);
                     deleteMessageLink.setAttribute('data-messagevalue', `${data.content.body}`);
-                    deleteMessageLink.setAttribute('data-messageid', `${data.id}`);
+                    deleteMessageLink.setAttribute('data-messageid', `${data.tempid}`);
                 }
 
                 chatMessagesList.scrollTop = chatMessagesList.scrollHeight;
@@ -172,6 +173,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
 socket.on('new_deletemessageid', function(data) {
     var messageElement = document.getElementsByClassName(data.message_id);
+    console.log(messageElement); 
+    console.log(data.message_id);
+    
     
     var messageBodyfortext = messageElement[0].querySelector('.messagebodyfordelete');
     var messageBodyforfile = messageElement[0].querySelector('a');
@@ -179,7 +183,7 @@ socket.on('new_deletemessageid', function(data) {
     if (messageBodyfortext) {
         messageBodyfortext.innerHTML = `<span style="color: red;">&#x2716; this message was deleted</span>`;
     }else{
-        messageBodyfortext.innerHTML = `<span style="color: red;">&#x2716; this message was deleted</span>`;
+        messageBodyforfile.innerHTML = `<span style="color: red;">&#x2716; this message was deleted</span>`;
     }
 });
 function formatDate(date, timezone) {
@@ -286,7 +290,7 @@ function handleNewMessage(data) {
                                     <i class="bx bx-dots-vertical-rounded fs-4"></i>
                                     </button>
                                 <div class="dropdown-menu dropdown-menu-start" aria-labelledby="chat-header-actions">
-                                    <a href="javascript:void(0)" class="idfordelete forfile" id="${data.tempid}" onclick="handleTakeingIdToDelete('${data.tempid}')" style="color:red; text-align:center;" data-bs-toggle="modal" data-bs-target="#deletemessage" data-messagevalue="${data.body}" data-messageid="${data.tempid}"><i class="bx bx-trash-alt"></i>Delete </a>
+                                    <a href="javascript:void(0)" class="idfordelete forfile" onclick="handleTakeingIdToDelete('${data.tempid}')" style="color:red; text-align:center;" data-bs-toggle="modal" data-bs-target="#deletemessage" data-messagevalue="${data.body}" data-messageid="${data.tempid}"><i class="bx bx-trash-alt"></i>Delete </a>
                                 </div>
                             </div>`;
                             chat.innerHTML += `
@@ -305,7 +309,7 @@ function handleNewMessage(data) {
                                         <div class="chat-message-text messageid" id="messageid"  style="${isthismyMessage ? 'margin-right:20px' : 'margin-left:20px'} ;" >
                                             <div class="chat-sender-name text-muted mb-1" style="cursor: pointer;">${!isthismyMessage ? senderName : ''}</div>
                                             ${hasImage ? `
-                                            <div id="hasimage">
+                                            <div id="${data.tempid}">
                                             <div class="spinner-border" id="spinner-border" role="status">
                                                 <span class="sr-only">Loading...</span>
                                             </div>
