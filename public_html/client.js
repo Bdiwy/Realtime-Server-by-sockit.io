@@ -213,16 +213,49 @@ function formatDate(date, timezone) {
     }
 }
 
+function messageSeen(chatId, messageDetails, user_id, user_type) {
+    let url;
+    switch (user_type) {
+        case 0:
+            url = 'http://127.0.0.1:8000/management/message-seen';
+            break;
+        case 1:
+            url = 'http://127.0.0.1:8000/teacher/message-seen';
+            break;
+        case 2:
+            url = 'http://127.0.0.1:8000/student/message-seen';
+            break;
+        default:
+            console.error('Invalid user type');
+            return; 
+    }
+
+    const fetchOptions = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            chatId: chatId,
+            messageDetails: messageDetails,
+            user_id: user_id,
+            user_type: user_type
+        })
+    };
+
+    fetch(url, fetchOptions)
+        .then(response => response.json())
+        .then(data => console.log(data))
+        .catch(error => console.error('Error:', error));
+}
 
 
 socket.on('new_msg',function(data){
-//  boradcast.innerHTML = '';
     realtimeMessage=document.getElementById('gr-'+data.chat_id);
-    console.log('realtimeid');
-    console.log(data);
     tempid = generateTempId();
     handleNewMessage(data) ;
     messageSound.play();
+    messageSeen(currentGroup,data,currentUserId,user_type);
 
     if ( messageType != 'file' ) {
     handelmessageid();
