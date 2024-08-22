@@ -217,13 +217,13 @@ function messageSeen(chatId, messageDetails, user_id, user_type) {
     let url;    
     switch (user_type) {
         case 0:
-            url = 'http://127.0.0.1:8000/management/message-seen';
+            url = appUrl + '/management/message-seen';
             break;
         case 1:
-            url = 'http://127.0.0.1:8000/teacher/message-seen';
+            url = appUrl + '/teacher/message-seen';
             break;
         case 2:
-            url = 'http://127.0.0.1:8000/student/message-seen';
+            url = appUrl + '/student/message-seen';
             break;
         default:
             console.error('Invalid user type');
