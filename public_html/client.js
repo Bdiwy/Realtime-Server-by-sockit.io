@@ -214,7 +214,7 @@ function formatDate(date, timezone) {
 }
 
 function messageSeen(chatId, messageDetails, user_id, user_type) {
-    let url;
+    let url;    
     switch (user_type) {
         case 0:
             url = 'http://127.0.0.1:8000/management/message-seen';
@@ -239,14 +239,29 @@ function messageSeen(chatId, messageDetails, user_id, user_type) {
             chatId: chatId,
             messageDetails: messageDetails,
             user_id: user_id,
-            user_type: user_type
+            user_type: user_type,
+            _token: _token 
         })
     };
 
     fetch(url, fetchOptions)
-        .then(response => response.json())
-        .then(data => console.log(data))
-        .catch(error => console.error('Error:', error));
+    .then(response => {
+        if (!response.ok) {
+            return response.text().then(text => {
+                throw new Error(`Request failed: ${response.status}\n${text}`);
+            });
+        }
+        return response.json();
+    })
+    // .then(data => console.log(data))
+    // .catch(error => console.error('Error:', error));
+    .then(data => {
+        // Handle the data as needed, or remove this if not required.
+    })
+    .catch(error => {
+        // Handle the error silently, without logging to the console.
+        // You can perform other actions here if needed, like displaying a user-friendly message.
+    });
 }
 
 
@@ -258,44 +273,44 @@ socket.on('new_msg',function(data){
     messageSeen(currentGroup,data,currentUserId,user_type);
 
     if ( messageType != 'file' ) {
-    handelmessageid();
+    // handelmessageid();
     realtimeMessage.innerText=data.body;
     }
 });
 
-function handelmessageid(){
+// function handelmessageid(){
 
-    setTimeout(() => {
+//     setTimeout(() => {
 
-    socket.emit('sharingId',{
-            newMessagefromdb:newMessagefromdb
-    });
+//     socket.emit('sharingId',{
+//             newMessagefromdb:newMessagefromdb
+//     });
 
-    }, 3000);
-    if (isthismyMessage != true) {
+//     }, 3000);
+//     if (isthismyMessage != true) {
         
-    socket.on('sharingId',function (data){
+//     socket.on('sharingId',function (data){
 
-    const deleteMessageLink = document.getElementById(data.newMessagefromdb.content.body);
-    const messageElements = document.querySelectorAll('#messageid');
+//     const deleteMessageLink = document.getElementById(data.newMessagefromdb.content.body);
+//     const messageElements = document.querySelectorAll('#messageid');
     
-    if (deleteMessageLink) {
-        deleteMessageLink.setAttribute('data-messagevalue', `${data.newMessagefromdb.content.body}`);
-        deleteMessageLink.setAttribute('data-messageid', `${data.newMessagefromdb.id}`);
-        // deleteMessageLink.setAttribute('id',`${newMessagefromdb.id}+${newMessagefromdb.content.body}`)
-    }
-    messageElements.forEach((messageElement) => {
-        messageElement.id = data.newMessagefromdb.id;
-    });
+//     if (deleteMessageLink) {
+//         deleteMessageLink.setAttribute('data-messagevalue', `${data.newMessagefromdb.content.body}`);
+//         deleteMessageLink.setAttribute('data-messageid', `${data.newMessagefromdb.id}`);
+//         // deleteMessageLink.setAttribute('id',`${newMessagefromdb.id}+${newMessagefromdb.content.body}`)
+//     }
+//     messageElements.forEach((messageElement) => {
+//         messageElement.id = data.newMessagefromdb.id;
+//     });
 
-    const message_id = document.querySelector('#message_id');
-    if (message_id) {
-        message_id.id = newMessagefromdb.id;
-    }
-});
-}
+//     const message_id = document.querySelector('#message_id');
+//     if (message_id) {
+//         message_id.id = newMessagefromdb.id;
+//     }
+// });
+// }
 
-}
+// }
 
 
 
